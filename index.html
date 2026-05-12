@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TATUSF ARM | Responsive Django-ready MVP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="toast-container" aria-live="polite"></div>
+
+  <!-- LOGIN -->
+  <section id="login-page" class="login-page">
+    <div class="blob blob-one"></div>
+    <div class="blob blob-two"></div>
+
+    <div class="card login-card animate-up">
+      <div class="brand-block">
+        <button class="brand-logo" aria-label="TATUSF ARM">📚</button>
+        <h1 class="font-display">TATUSF <em>ARM</em></h1>
+        <p id="login-subtitle" data-i18n="login_subtitle">Axborot markazi ekotizimi</p>
+      </div>
+
+      <form id="login-form" class="form-stack">
+        <label class="field">
+          <span data-i18n="hemis_id">HEMIS ID</span>
+          <input class="inp" id="login-id" type="text" placeholder="322201100452" autocomplete="username" />
+        </label>
+        <label class="field">
+          <span data-i18n="password">Parol</span>
+          <input class="inp" id="login-password" type="password" placeholder="student123" autocomplete="current-password" />
+        </label>
+        <button class="btn-primary full" type="submit" data-i18n="login">Kirish</button>
+      </form>
+
+      <p class="helper-text">Demo: <span class="font-mono">322201100452 / student123</span></p>
+
+      <div class="login-lang-row">
+        <button class="btn-ghost" type="button" onclick="setLang('uz')">🇺🇿 UZ</button>
+        <button class="btn-ghost" type="button" onclick="setLang('ru')">🇷🇺 RU</button>
+        <button class="btn-ghost" type="button" onclick="setLang('en')">🇬🇧 EN</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- APP -->
+  <div id="main-app" class="main-app hidden">
+    <header class="topbar glass">
+      <div class="topbar-inner">
+        <button class="brand-mini" onclick="showPage('main')" type="button">
+          <span class="brand-icon">📚</span>
+          <span class="font-display"><em>TATUSF</em> ARM</span>
+        </button>
+
+        <nav class="desktop-nav" aria-label="Asosiy menyu">
+          <button class="nav-link" id="nl-main" onclick="showPage('main')" data-i18n="nav_main">Bosh</button>
+          <button class="nav-link" id="nl-catalog" onclick="showPage('catalog')" data-i18n="nav_catalog">Katalog</button>
+          <button class="nav-link" id="nl-profile" onclick="showPage('profile')" data-i18n="nav_profile">Profil</button>
+          <button class="nav-link" id="nl-admin" onclick="showPage('admin')" data-i18n="nav_admin">Admin</button>
+        </nav>
+
+        <div class="top-actions">
+          <div class="lang-wrap">
+            <button class="icon-btn text-btn" id="lang-btn" onclick="toggleLangMenu()" type="button">🌐 <span id="lang-label">UZ</span></button>
+            <div id="lang-menu" class="lang-menu hidden">
+              <button type="button" onclick="setLang('uz');toggleLangMenu(true)">🇺🇿 O‘zbek</button>
+              <button type="button" onclick="setLang('ru');toggleLangMenu(true)">🇷🇺 Русский</button>
+              <button type="button" onclick="setLang('en');toggleLangMenu(true)">🇬🇧 English</button>
+            </div>
+          </div>
+          <button class="icon-btn" onclick="toggleDark()" id="dark-btn" type="button" aria-label="Dark mode">🌙</button>
+          <button class="btn-danger hide-sm" onclick="doLogout()" type="button" data-i18n="logout">Chiqish</button>
+          <button class="icon-btn mobile-only" onclick="toggleMobileMenu()" type="button" aria-label="Menyu">☰</button>
+        </div>
+      </div>
+    </header>
+
+    <aside class="mobile-menu" id="mobile-menu">
+      <button class="mobile-close" onclick="toggleMobileMenu()" type="button">✕</button>
+      <button onclick="showPage('main');toggleMobileMenu()" data-i18n="nav_main">🏠 Bosh</button>
+      <button onclick="showPage('catalog');toggleMobileMenu()" data-i18n="nav_catalog">📚 Katalog</button>
+      <button onclick="showPage('profile');toggleMobileMenu()" data-i18n="nav_profile">👤 Profil</button>
+      <button onclick="showPage('admin');toggleMobileMenu()" data-i18n="nav_admin">🛠 Admin</button>
+      <button onclick="doLogout()" data-i18n="logout">🚪 Chiqish</button>
+    </aside>
+
+    <main class="page-shell">
+      <!-- MAIN -->
+      <section id="page-main" class="page">
+        <div class="hero-bg hero-section">
+          <span class="badge badge-primary">✨ MVP + Django API + Responsive</span>
+          <h1 class="font-display">TATUSF <em>Axborot</em> Markazi</h1>
+          <p data-i18n="hero_sub">Kitoblar katalogi, o‘quvchi profili va admin boshqaruvi uchun yengil platforma.</p>
+
+          <div class="search-card">
+            <span>🔍</span>
+            <input id="search-input" class="search-input" data-i18n-placeholder="search_placeholder" placeholder="Kitob, muallif yoki kategoriya qidiring" />
+            <button class="btn-primary" onclick="searchBooks()" data-i18n="search">Qidirish</button>
+          </div>
+        </div>
+
+        <div class="container">
+          <div class="stats-grid">
+            <article class="card stat-card">
+              <strong id="stat-books">0</strong>
+              <span data-i18n="stats_books">Kitoblar</span>
+            </article>
+            <article class="card stat-card">
+              <strong id="stat-users">14K+</strong>
+              <span data-i18n="stats_users">Foydalanuvchilar</span>
+            </article>
+            <article class="card stat-card">
+              <strong>98%</strong>
+              <span data-i18n="stats_avail">Mavjudlik</span>
+            </article>
+          </div>
+
+          <div class="section-head">
+            <h2 data-i18n="recent_books">So‘nggi kitoblar</h2>
+            <button class="btn-outline" onclick="showPage('catalog')" data-i18n="see_all">Barchasini ko‘rish</button>
+          </div>
+          <div id="recent-books" class="book-grid"></div>
+        </div>
+      </section>
+
+      <!-- CATALOG -->
+      <section id="page-catalog" class="page hidden">
+        <div class="container">
+          <div class="page-title-row">
+            <div>
+              <h1 class="font-display" data-i18n="nav_catalog">Katalog</h1>
+              <p><span id="catalog-count">0</span> <span data-i18n="results">ta natija</span></p>
+            </div>
+            <button class="btn-primary" onclick="showPage('admin')" data-i18n="add_book">Kitob qo‘shish</button>
+          </div>
+
+          <div class="catalog-layout">
+            <aside class="filter-panel card">
+              <h3 data-i18n="filter">Filter</h3>
+              <label class="field">
+                <span data-i18n="category">Kategoriya</span>
+                <select class="inp" id="filter-category" onchange="applyFilters()">
+                  <option value="all" data-i18n="all">Barchasi</option>
+                  <option value="IT">IT</option>
+                  <option value="Physics">Physics</option>
+                  <option value="Math">Math</option>
+                  <option value="Literature">Literature</option>
+                </select>
+              </label>
+              <label class="field">
+                <span data-i18n="format">Format</span>
+                <select class="inp" id="filter-format" onchange="applyFilters()">
+                  <option value="all" data-i18n="all">Barchasi</option>
+                  <option value="PDF">PDF</option>
+                  <option value="EPUB">EPUB</option>
+                  <option value="Audio">Audio</option>
+                </select>
+              </label>
+              <label class="field">
+                <span data-i18n="sort">Saralash</span>
+                <select class="inp" id="sort-books" onchange="applyFilters()">
+                  <option value="new" data-i18n="sort_new">Yangi</option>
+                  <option value="rating" data-i18n="sort_rating">Reyting</option>
+                  <option value="title" data-i18n="sort_title">Nom bo‘yicha</option>
+                </select>
+              </label>
+            </aside>
+
+            <div class="catalog-content">
+              <div id="catalog-grid" class="book-grid"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- READER -->
+      <section id="page-reader" class="page hidden">
+        <div class="reader-container">
+          <div class="reader-top">
+            <button class="btn-ghost" onclick="showPage('catalog')">← <span data-i18n="back_catalog">Katalogga qaytish</span></button>
+            <div class="reader-tools">
+              <button class="btn-ghost" onclick="changeReaderFont(1)">A+</button>
+              <button class="btn-ghost" onclick="changeReaderFont(-1)">A−</button>
+              <button class="btn-ghost" onclick="toggleFocusMode()" data-i18n="focus_mode">Fokus</button>
+            </div>
+          </div>
+
+          <article class="card reader-card" id="reader-card">
+            <span class="badge badge-accent" id="reader-format">PDF</span>
+            <h1 class="font-display" id="reader-title">Kitob nomi</h1>
+            <p class="reader-meta" id="reader-meta">Muallif · Yil · Kategoriya</p>
+            <div id="reader-text" class="reader-text"></div>
+          </article>
+        </div>
+      </section>
+
+      <!-- PROFILE -->
+      <section id="page-profile" class="page hidden">
+        <div class="container narrow">
+          <div class="card profile-card">
+            <div class="avatar">👤</div>
+            <div>
+              <h1 class="font-display" id="profile-name">A. Kurbanov</h1>
+              <p id="profile-role" data-i18n="student_profile">Talaba profili</p>
+              <div class="profile-badges">
+                <span class="badge badge-primary">🏆 1240 XP</span>
+                <span class="badge badge-accent">🔥 7 kun streak</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-grid">
+            <article class="card profile-widget">
+              <h2 data-i18n="my_books">Mening kitoblarim</h2>
+              <div id="profile-books" class="mini-list"></div>
+            </article>
+            <article class="card profile-widget">
+              <h2 data-i18n="reading_stats">O‘qish statistikasi</h2>
+              <div class="progress-row">
+                <span data-i18n="daily_goal">Kunlik maqsad</span>
+                <strong>60%</strong>
+              </div>
+              <div class="progress"><div style="width:60%"></div></div>
+              <p class="muted" data-i18n="goal_text">Bugun 3 / 5 sahifa o‘qildi</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ADMIN -->
+      <section id="page-admin" class="page hidden">
+        <div class="container narrow">
+          <div class="page-title-row">
+            <div>
+              <h1 class="font-display" data-i18n="admin_title">Admin panel</h1>
+              <p data-i18n="admin_sub">Kitoblarni qo‘shish va ro‘yxatni boshqarish</p>
+            </div>
+          </div>
+
+          <form id="book-form" class="card admin-form">
+            <h2 data-i18n="add_book">Kitob qo‘shish</h2>
+            <div class="form-grid">
+              <label class="field">
+                <span data-i18n="title">Sarlavha</span>
+                <input class="inp" id="book-title" required />
+              </label>
+              <label class="field">
+                <span data-i18n="author">Muallif</span>
+                <input class="inp" id="book-author" required />
+              </label>
+              <label class="field">
+                <span data-i18n="year">Yil</span>
+                <input class="inp" id="book-year" type="number" min="1900" max="2100" required />
+              </label>
+              <label class="field">
+                <span data-i18n="category">Kategoriya</span>
+                <select class="inp" id="book-category">
+                  <option value="IT">IT</option>
+                  <option value="Physics">Physics</option>
+                  <option value="Math">Math</option>
+                  <option value="Literature">Literature</option>
+                </select>
+              </label>
+              <label class="field">
+                <span data-i18n="format">Format</span>
+                <select class="inp" id="book-format">
+                  <option value="PDF">PDF</option>
+                  <option value="EPUB">EPUB</option>
+                  <option value="Audio">Audio</option>
+                </select>
+              </label>
+              <label class="field">
+                <span data-i18n="rating">Reyting</span>
+                <input class="inp" id="book-rating" type="number" min="1" max="5" step="0.1" value="4.5" />
+              </label>
+            </div>
+            <label class="field">
+              <span data-i18n="description">Tavsif</span>
+              <textarea class="inp" id="book-description" rows="4"></textarea>
+            </label>
+            <button class="btn-primary" type="submit" data-i18n="save">Saqlash</button>
+          </form>
+
+          <article class="card admin-list">
+            <h2 data-i18n="current_books">Joriy kitoblar</h2>
+            <div id="admin-books" class="table-wrap"></div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
