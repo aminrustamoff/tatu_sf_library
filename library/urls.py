@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.authtoken.views import obtain_auth_token
 
 from .views import (
+    AIQueryView,
     BookViewSet,
     CurrentUserView,
     NoteViewSet,
@@ -24,4 +25,5 @@ urlpatterns = [
     path('auth/user/', CurrentUserView.as_view(), name='api-user'),
     path('auth/users/', UserListView.as_view(), name='user-list'),
     path('auth/users/<int:pk>/', UserDetailView.as_view(), name='user-detail'),
+    path('ai/query/', AIQueryView.as_view(), name='ai-query'),
 ]

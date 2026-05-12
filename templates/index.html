@@ -287,6 +287,33 @@
         </div>
       </section>
 
+      <!-- ══════════════════ AI ASSISTANT ══════════════════ -->
+      <section id="page-ai" class="page hidden">
+        <div class="container narrow">
+          <div class="page-title-row">
+            <div>
+              <h1 class="font-display" data-i18n="ai_title">AI Assistant</h1>
+              <p class="muted" data-i18n="ai_sub">Interaktiv AI bo'limi, sizning modelni shu yerga ulang.</p>
+            </div>
+          </div>
+
+          <article class="card">
+            <label class="field" style="width:100%">
+              <span data-i18n="ai_prompt_label">Savolingiz</span>
+              <textarea class="inp" id="ai-prompt" rows="5" data-i18n-placeholder="ai_input_placeholder" placeholder="Savol yozing..."></textarea>
+            </label>
+            <button class="btn-primary" id="ai-send-btn" type="button" onclick="sendAiPrompt()" data-i18n="ai_send_button">AI ga yuborish</button>
+
+            <div class="card" style="margin-top:1.5rem;padding:1rem;border:1px solid var(--border);border-radius:1rem;">
+              <h3 data-i18n="ai_response_label">Javob</h3>
+              <div id="ai-response" class="ai-response" style="white-space:pre-wrap;min-height:140px;padding-top:0.5rem;">
+                <span data-i18n="ai_response_empty">AI javobi shu yerda ko'rinadi.</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
       <!-- ══ ADMIN ══ -->
       <section id="page-admin" class="page hidden">
         <div class="container narrow">

@@ -32,6 +32,54 @@ async function apiPost(url, data) {
   return res.json();
 }
 
+async function queryAi(prompt) {
+  return apiPost('/ai/query/', { prompt });
+}
+
+
+async function askAI(prompt) {
+  const token = localStorage.getItem("access");
+
+  const response = await fetch("http://127.0.0.1:8000/api/ai/query/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify({ prompt: prompt })
+  });
+
+  const data = await response.json();
+  console.log(data.response);
+}
+
+
+async function sendAiPrompt() {
+  const input = document.getElementById('ai-prompt');
+  const btn = document.getElementById('ai-send-btn');
+  const responseEl = document.getElementById('ai-response');
+  if (!input || !btn || !responseEl) return;
+
+  const prompt = input.value.trim();
+  if (!prompt) { showToast(t('ai_empty_prompt')); return; }
+
+  btn.disabled = true;
+  const originalText = btn.textContent;
+  btn.textContent = '...';
+  responseEl.textContent = t('ai_waiting');
+
+  try {
+    const data = await queryAi(prompt);
+    responseEl.textContent = data.response || t('ai_no_response');
+  } catch (e) {
+    responseEl.textContent = t('ai_error_occurred');
+    showToast(e.message || t('ai_error_occurred'));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalText;
+  }
+}
+
 async function apiPatch(url, data) {
   const res = await fetch(`${API_BASE}${url}`, {
     method: 'PATCH', headers: getHeaders(), body: JSON.stringify(data)
@@ -65,9 +113,13 @@ const LANGS = {
   uz: {
     login_subtitle: 'Axborot markazi ekotizimi',
     hemis_id: 'HEMIS ID', password: 'Parol', login: 'Kirish', logout: 'Chiqish',
-    nav_main: 'Bosh', nav_catalog: 'Katalog', nav_profile: 'Profil', nav_admin: 'Admin',
+    nav_main: 'Bosh', nav_catalog: 'Katalog', nav_profile: 'Profil', nav_admin: 'Admin', nav_ai: 'AI',
     hero_sub: 'Kitoblar katalogi, o\'quvchi profili va admin boshqaruvi uchun yengil platforma.',
     search_placeholder: 'Kitob, muallif yoki kategoriya qidiring', search: 'Qidirish',
+    ai_title: 'AI Assistant', ai_sub: 'Interaktiv AI bo\'limi, sizning modelni shu yerga ulang.',
+    ai_prompt_label: 'Savolingiz', ai_input_placeholder: 'Savol yozing...', ai_send_button: 'AI ga yuborish',
+    ai_response_label: 'Javob', ai_response_empty: 'AI javobi shu yerda ko\'rinadi.', ai_empty_prompt: 'Iltimos, savol yozing.',
+    ai_waiting: 'Kutilyapti...', ai_no_response: 'Hech qanday javob topilmadi.', ai_error_occurred: 'AI bilan bog\'liq xatolik.',
     stats_books: 'Kitoblar', stats_users: 'Foydalanuvchilar', stats_avail: 'Mavjudlik',
     recent_books: 'So\'nggi kitoblar', see_all: 'Barchasini ko\'rish',
     results: 'ta natija', add_book: 'Kitob qo\'shish', filter: 'Filter',
@@ -102,9 +154,13 @@ const LANGS = {
   ru: {
     login_subtitle: 'Экосистема информационного центра',
     hemis_id: 'HEMIS ID', password: 'Пароль', login: 'Войти', logout: 'Выйти',
-    nav_main: 'Главная', nav_catalog: 'Каталог', nav_profile: 'Профиль', nav_admin: 'Админ',
+    nav_main: 'Главная', nav_catalog: 'Каталог', nav_profile: 'Профиль', nav_admin: 'Админ', nav_ai: 'AI',
     hero_sub: 'Лёгкая платформа для каталога книг, профиля читателя и административной панели.',
     search_placeholder: 'Поиск по книге, автору или категории', search: 'Поиск',
+    ai_title: 'AI Assistant', ai_sub: 'Интерактивный AI-раздел, подключите вашу модель здесь.',
+    ai_prompt_label: 'Ваш вопрос', ai_input_placeholder: 'Введите запрос...', ai_send_button: 'Отправить AI',
+    ai_response_label: 'Ответ', ai_response_empty: 'Ответ AI появится здесь.', ai_empty_prompt: 'Пожалуйста, введите запрос.',
+    ai_waiting: 'Ожидание...', ai_no_response: 'Ответ не получен.', ai_error_occurred: 'Ошибка AI.',
     stats_books: 'Книги', stats_users: 'Пользователи', stats_avail: 'Доступность',
     recent_books: 'Новые книги', see_all: 'Смотреть все',
     results: 'результатов', add_book: 'Добавить книгу', filter: 'Фильтр',
@@ -139,9 +195,13 @@ const LANGS = {
   en: {
     login_subtitle: 'Information center ecosystem',
     hemis_id: 'HEMIS ID', password: 'Password', login: 'Login', logout: 'Logout',
-    nav_main: 'Home', nav_catalog: 'Catalog', nav_profile: 'Profile', nav_admin: 'Admin',
+    nav_main: 'Home', nav_catalog: 'Catalog', nav_profile: 'Profile', nav_admin: 'Admin', nav_ai: 'AI',
     hero_sub: 'A lightweight platform for book catalog, reader profile and admin management.',
     search_placeholder: 'Search by book, author or category', search: 'Search',
+    ai_title: 'AI Assistant', ai_sub: 'Interactive AI section, connect your model here.',
+    ai_prompt_label: 'Your question', ai_input_placeholder: 'Enter a question...', ai_send_button: 'Ask AI',
+    ai_response_label: 'Response', ai_response_empty: 'The AI answer will appear here.', ai_empty_prompt: 'Please enter a question.',
+    ai_waiting: 'Waiting...', ai_no_response: 'No response received.', ai_error_occurred: 'AI error occurred.',
     stats_books: 'Books', stats_users: 'Users', stats_avail: 'Availability',
     recent_books: 'Recent books', see_all: 'See all',
     results: 'results', add_book: 'Add book', filter: 'Filter',
@@ -945,6 +1005,8 @@ function showPage(page) {
   document.getElementById(`page-${page}`)?.classList.remove('hidden');
   document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
   document.getElementById(`nl-${page}`)?.classList.add('active');
+  document.getElementById('ai-prompt')?.blur();
+  if (page === 'ai') document.getElementById('ai-prompt')?.focus();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
   // Lazy load per-page data

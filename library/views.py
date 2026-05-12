@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions, filters
+from rest_framework import viewsets, permissions, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -12,6 +12,8 @@ from .serializers import (
     NotificationSerializer,
     ReadingProgressSerializer,
 )
+
+from .services.ai_service import run_ai_prompt
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
@@ -68,6 +70,39 @@ class CurrentUserView(APIView):
             'notes_count': notes_count,
             'unread_notifications': unread_count,
         })
+
+
+def run_ai_prompt(prompt, user=None):
+    # TODO: replace this placeholder with your actual AI model integration.
+    # You can call a local model, cloud API, or custom inference endpoint here.
+    return f"AI model placeholder response for query: '{prompt}'"
+
+
+class AIQueryView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        prompt = str(request.data.get('prompt', '')).strip()
+
+        if not prompt:
+            return Response(
+                {'detail': 'Prompt is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            response_text = run_ai_prompt(prompt, request.user)
+
+            return Response({
+                'prompt': prompt,
+                'response': response_text
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({
+                'detail': 'AI server bilan ulanishda xatolik yuz berdi.',
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class NotificationViewSet(viewsets.ModelViewSet):
