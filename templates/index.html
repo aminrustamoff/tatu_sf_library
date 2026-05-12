@@ -1,11 +1,10 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TATUSF ARM | Responsive Django-ready MVP</title>
+  <title>TATUSF ARM | Axborot Markazi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -14,18 +13,16 @@
 <body>
   <div id="toast-container" aria-live="polite"></div>
 
-  <!-- LOGIN -->
+  <!-- ══════════════════ LOGIN ══════════════════ -->
   <section id="login-page" class="login-page">
     <div class="blob blob-one"></div>
     <div class="blob blob-two"></div>
-
     <div class="card login-card animate-up">
       <div class="brand-block">
         <button class="brand-logo" aria-label="TATUSF ARM">📚</button>
         <h1 class="font-display">TATUSF <em>ARM</em></h1>
         <p id="login-subtitle" data-i18n="login_subtitle">Axborot markazi ekotizimi</p>
       </div>
-
       <form id="login-form" class="form-stack">
         <label class="field">
           <span data-i18n="hemis_id">HEMIS ID</span>
@@ -33,13 +30,10 @@
         </label>
         <label class="field">
           <span data-i18n="password">Parol</span>
-          <input class="inp" id="login-password" type="password" placeholder="student123" autocomplete="current-password" />
+          <input class="inp" id="login-password" type="password" placeholder="••••••••" autocomplete="current-password" />
         </label>
-        <button class="btn-primary full" type="submit" data-i18n="login">Kirish</button>
+        <button class="btn-primary full" type="submit" id="login-btn" data-i18n="login">Kirish</button>
       </form>
-
-      <p class="helper-text">Demo: <span class="font-mono">322201100452 / student123</span></p>
-
       <div class="login-lang-row">
         <button class="btn-ghost" type="button" onclick="setLang('uz')">🇺🇿 UZ</button>
         <button class="btn-ghost" type="button" onclick="setLang('ru')">🇷🇺 RU</button>
@@ -48,8 +42,10 @@
     </div>
   </section>
 
-  <!-- APP -->
+  <!-- ══════════════════ APP ══════════════════ -->
   <div id="main-app" class="main-app hidden">
+
+    <!-- TOPBAR -->
     <header class="topbar glass">
       <div class="topbar-inner">
         <button class="brand-mini" onclick="showPage('main')" type="button">
@@ -58,17 +54,23 @@
         </button>
 
         <nav class="desktop-nav" aria-label="Asosiy menyu">
-          <button class="nav-link" id="nl-main" onclick="showPage('main')" data-i18n="nav_main">Bosh</button>
+          <button class="nav-link" id="nl-main"    onclick="showPage('main')"    data-i18n="nav_main">Bosh</button>
           <button class="nav-link" id="nl-catalog" onclick="showPage('catalog')" data-i18n="nav_catalog">Katalog</button>
           <button class="nav-link" id="nl-profile" onclick="showPage('profile')" data-i18n="nav_profile">Profil</button>
-          <button class="nav-link admin-only" id="nl-admin" onclick="showPage('admin')" data-i18n="nav_admin">Admin</button>
+          <button class="nav-link admin-only hidden" id="nl-admin" onclick="showPage('admin')" data-i18n="nav_admin">Admin</button>
+          <button class="nav-link" id="nl-ai" onclick="showPage('ai')" data-i18n="nav_ai">AI Assistant</button>
         </nav>
 
         <div class="top-actions">
+          <!-- Notifications bell -->
+          <button class="icon-btn notif-btn" id="notif-btn" onclick="showPage('profile');switchTab('notifs')" type="button" aria-label="Bildirishnomalar">
+            🔔<span class="notif-dot hidden" id="notif-dot"></span>
+          </button>
+
           <div class="lang-wrap">
             <button class="icon-btn text-btn" id="lang-btn" onclick="toggleLangMenu()" type="button">🌐 <span id="lang-label">UZ</span></button>
             <div id="lang-menu" class="lang-menu hidden">
-              <button type="button" onclick="setLang('uz');toggleLangMenu(true)">🇺🇿 O‘zbek</button>
+              <button type="button" onclick="setLang('uz');toggleLangMenu(true)">🇺🇿 O'zbek</button>
               <button type="button" onclick="setLang('ru');toggleLangMenu(true)">🇷🇺 Русский</button>
               <button type="button" onclick="setLang('en');toggleLangMenu(true)">🇬🇧 English</button>
             </div>
@@ -80,23 +82,25 @@
       </div>
     </header>
 
+    <!-- MOBILE MENU -->
     <aside class="mobile-menu" id="mobile-menu">
       <button class="mobile-close" onclick="toggleMobileMenu()" type="button">✕</button>
-      <button onclick="showPage('main');toggleMobileMenu()" data-i18n="nav_main">🏠 Bosh</button>
+      <button onclick="showPage('main');toggleMobileMenu()"    data-i18n="nav_main">🏠 Bosh</button>
       <button onclick="showPage('catalog');toggleMobileMenu()" data-i18n="nav_catalog">📚 Katalog</button>
       <button onclick="showPage('profile');toggleMobileMenu()" data-i18n="nav_profile">👤 Profil</button>
-      <button class="admin-only" id="mobile-admin-link" onclick="showPage('admin');toggleMobileMenu()" data-i18n="nav_admin">🛠 Admin</button>
+      <button class="admin-only hidden" id="mobile-admin-link" onclick="showPage('admin');toggleMobileMenu()" data-i18n="nav_admin">🛠 Admin</button>
+      <button onclick="showPage('ai');toggleMobileMenu()" data-i18n="nav_ai">🤖 AI Assistant</button>
       <button onclick="doLogout()" data-i18n="logout">🚪 Chiqish</button>
     </aside>
 
     <main class="page-shell">
-      <!-- MAIN -->
+
+      <!-- ══ MAIN ══ -->
       <section id="page-main" class="page">
         <div class="hero-bg hero-section">
-          <span class="badge badge-primary">✨ MVP + Django API + Responsive</span>
+          <span class="badge badge-primary">✨ MVP · Django API · Responsive</span>
           <h1 class="font-display">TATUSF <em>Axborot</em> Markazi</h1>
-          <p data-i18n="hero_sub">Kitoblar katalogi, o‘quvchi profili va admin boshqaruvi uchun yengil platforma.</p>
-
+          <p data-i18n="hero_sub">Kitoblar katalogi, o'quvchi profili va admin boshqaruvi uchun yengil platforma.</p>
           <div class="search-card">
             <span>🔍</span>
             <input id="search-input" class="search-input" data-i18n-placeholder="search_placeholder" placeholder="Kitob, muallif yoki kategoriya qidiring" />
@@ -111,7 +115,7 @@
               <span data-i18n="stats_books">Kitoblar</span>
             </article>
             <article class="card stat-card">
-              <strong id="stat-users">14K+</strong>
+              <strong id="stat-users">—</strong>
               <span data-i18n="stats_users">Foydalanuvchilar</span>
             </article>
             <article class="card stat-card">
@@ -121,14 +125,14 @@
           </div>
 
           <div class="section-head">
-            <h2 data-i18n="recent_books">So‘nggi kitoblar</h2>
-            <button class="btn-outline" onclick="showPage('catalog')" data-i18n="see_all">Barchasini ko‘rish</button>
+            <h2 data-i18n="recent_books">So'nggi kitoblar</h2>
+            <button class="btn-outline" onclick="showPage('catalog')" data-i18n="see_all">Barchasini ko'rish</button>
           </div>
           <div id="recent-books" class="book-grid"></div>
         </div>
       </section>
 
-      <!-- CATALOG -->
+      <!-- ══ CATALOG ══ -->
       <section id="page-catalog" class="page hidden">
         <div class="container">
           <div class="page-title-row">
@@ -136,7 +140,6 @@
               <h1 class="font-display" data-i18n="nav_catalog">Katalog</h1>
               <p><span id="catalog-count">0</span> <span data-i18n="results">ta natija</span></p>
             </div>
-            <button class="btn-primary" onclick="showPage('admin')" data-i18n="add_book">Kitob qo‘shish</button>
           </div>
 
           <div class="catalog-layout">
@@ -158,15 +161,15 @@
                   <option value="all" data-i18n="all">Barchasi</option>
                   <option value="PDF">PDF</option>
                   <option value="EPUB">EPUB</option>
-                  <option value="Audio">Audio</option>
+                  <option value="AUDIO">Audio</option>
                 </select>
               </label>
               <label class="field">
                 <span data-i18n="sort">Saralash</span>
                 <select class="inp" id="sort-books" onchange="applyFilters()">
-                  <option value="new" data-i18n="sort_new">Yangi</option>
+                  <option value="new"    data-i18n="sort_new">Yangi</option>
                   <option value="rating" data-i18n="sort_rating">Reyting</option>
-                  <option value="title" data-i18n="sort_title">Nom bo‘yicha</option>
+                  <option value="title"  data-i18n="sort_title">Nom bo'yicha</option>
                 </select>
               </label>
             </aside>
@@ -178,7 +181,7 @@
         </div>
       </section>
 
-      <!-- READER -->
+      <!-- ══ READER ══ -->
       <section id="page-reader" class="page hidden">
         <div class="reader-container">
           <div class="reader-top">
@@ -187,113 +190,204 @@
               <button class="btn-ghost" onclick="changeReaderFont(1)">A+</button>
               <button class="btn-ghost" onclick="changeReaderFont(-1)">A−</button>
               <button class="btn-ghost" onclick="toggleFocusMode()" data-i18n="focus_mode">Fokus</button>
+              <a id="reader-download-btn" class="btn-primary hidden" target="_blank" rel="noopener" data-i18n="download">⬇ Yuklab olish</a>
             </div>
           </div>
 
           <article class="card reader-card" id="reader-card">
-            <span class="badge badge-accent" id="reader-format">PDF</span>
+            <div class="reader-book-header">
+              <span class="badge badge-primary" id="reader-format">PDF</span>
+              <span class="badge badge-accent" id="reader-category-badge"></span>
+            </div>
             <h1 class="font-display" id="reader-title">Kitob nomi</h1>
             <p class="reader-meta" id="reader-meta">Muallif · Yil · Kategoriya</p>
             <div id="reader-text" class="reader-text"></div>
+
+            <!-- Reading progress update -->
+            <div class="reading-progress-block card-inner">
+              <h3 data-i18n="reading_progress">O'qish jarayoni</h3>
+              <div class="progress-inputs">
+                <label class="field">
+                  <span data-i18n="current_page">Joriy sahifa</span>
+                  <input class="inp" id="prog-current" type="number" min="1" value="1" />
+                </label>
+                <label class="field">
+                  <span data-i18n="total_pages">Jami sahifalar</span>
+                  <input class="inp" id="prog-total" type="number" min="1" value="100" />
+                </label>
+              </div>
+              <button class="btn-outline" onclick="saveReadingProgress()" data-i18n="save_progress">Jarayonni saqlash</button>
+            </div>
+
+            <!-- Notes for this book -->
+            <div class="book-notes-block">
+              <h3 data-i18n="my_notes">Izohlarim</h3>
+              <div id="reader-notes" class="notes-list"></div>
+              <div class="note-form">
+                <textarea class="inp" id="reader-note-input" rows="3" data-i18n-placeholder="note_placeholder" placeholder="Izoh yozing..."></textarea>
+                <button class="btn-primary" onclick="addNoteForCurrentBook()" data-i18n="add_note">Izoh qo'shish</button>
+              </div>
+            </div>
           </article>
         </div>
       </section>
 
-      <!-- PROFILE -->
+      <!-- ══ PROFILE ══ -->
       <section id="page-profile" class="page hidden">
         <div class="container narrow">
+          <!-- User card -->
           <div class="card profile-card">
-            <div class="avatar">👤</div>
-            <div>
-              <h1 class="font-display" id="profile-name">A. Kurbanov</h1>
-              <p id="profile-role" data-i18n="student_profile">Talaba profili</p>
+            <div class="avatar" id="profile-avatar">👤</div>
+            <div class="profile-info">
+              <h1 class="font-display" id="profile-name">—</h1>
+              <p id="profile-role" class="muted" data-i18n="student_profile">Talaba profili</p>
               <div class="profile-badges">
-                <span class="badge badge-primary">🏆 1240 XP</span>
-                <span class="badge badge-accent">🔥 7 kun streak</span>
+                <span class="badge badge-primary" id="badge-xp">🏆 0 XP</span>
+                <span class="badge badge-accent"   id="badge-books">📚 0 kitob</span>
+                <span class="badge badge-notif hidden" id="badge-notif">🔔 0</span>
               </div>
             </div>
           </div>
 
-          <div class="profile-grid">
-            <article class="card profile-widget">
-              <h2 data-i18n="my_books">Mening kitoblarim</h2>
-              <div id="profile-books" class="mini-list"></div>
-            </article>
-            <article class="card profile-widget">
-              <h2 data-i18n="reading_stats">O‘qish statistikasi</h2>
-              <div class="progress-row">
-                <span data-i18n="daily_goal">Kunlik maqsad</span>
-                <strong>60%</strong>
-              </div>
-              <div class="progress"><div style="width:60%"></div></div>
-              <p class="muted" data-i18n="goal_text">Bugun 3 / 5 sahifa o‘qildi</p>
-            </article>
+          <!-- Profile tabs -->
+          <div class="tabs-bar">
+            <button class="tab-btn active" onclick="switchTab('progress')" data-tab="progress" data-i18n="tab_progress">O'qish jarayoni</button>
+            <button class="tab-btn"        onclick="switchTab('notes')"    data-tab="notes"    data-i18n="tab_notes">Izohlar</button>
+            <button class="tab-btn"        onclick="switchTab('notifs')"   data-tab="notifs"   data-i18n="tab_notifs">Bildirishnomalar</button>
+          </div>
+
+          <!-- Tab: Reading progress -->
+          <div id="tab-progress" class="tab-panel">
+            <div id="profile-progress" class="progress-list"></div>
+          </div>
+
+          <!-- Tab: Notes -->
+          <div id="tab-notes" class="tab-panel hidden">
+            <div id="profile-notes" class="notes-list"></div>
+            <div class="card note-add-card">
+              <h3 data-i18n="add_note_for">Yangi izoh</h3>
+              <label class="field">
+                <span data-i18n="for_book">Kitob (ixtiyoriy)</span>
+                <select class="inp" id="note-book-select">
+                  <option value="">— Umumiy izoh —</option>
+                </select>
+              </label>
+              <textarea class="inp" id="note-text-input" rows="4" data-i18n-placeholder="note_placeholder" placeholder="Izoh yozing..."></textarea>
+              <button class="btn-primary" onclick="addNote()" data-i18n="save_note">Saqlash</button>
+            </div>
+          </div>
+
+          <!-- Tab: Notifications -->
+          <div id="tab-notifs" class="tab-panel hidden">
+            <div class="notif-actions">
+              <button class="btn-outline" onclick="markAllRead()" data-i18n="mark_all_read">Barchasini o'qildi deb belgilash</button>
+            </div>
+            <div id="profile-notifs" class="notif-list"></div>
           </div>
         </div>
       </section>
 
-      <!-- ADMIN -->
+      <!-- ══ ADMIN ══ -->
       <section id="page-admin" class="page hidden">
         <div class="container narrow">
           <div class="page-title-row">
             <div>
               <h1 class="font-display" data-i18n="admin_title">Admin panel</h1>
-              <p data-i18n="admin_sub">Kitoblarni qo‘shish va ro‘yxatni boshqarish</p>
+              <p class="muted" data-i18n="admin_sub">Kitoblar va foydalanuvchilarni boshqarish</p>
             </div>
           </div>
 
-          <form id="book-form" class="card admin-form">
-            <h2 data-i18n="add_book">Kitob qo‘shish</h2>
-            <div class="form-grid">
-              <label class="field">
-                <span data-i18n="title">Sarlavha</span>
-                <input class="inp" id="book-title" required />
-              </label>
-              <label class="field">
-                <span data-i18n="author">Muallif</span>
-                <input class="inp" id="book-author" required />
-              </label>
-              <label class="field">
-                <span data-i18n="year">Yil</span>
-                <input class="inp" id="book-year" type="number" min="1900" max="2100" required />
-              </label>
-              <label class="field">
-                <span data-i18n="category">Kategoriya</span>
-                <select class="inp" id="book-category">
-                  <option value="IT">IT</option>
-                  <option value="Physics">Physics</option>
-                  <option value="Math">Math</option>
-                  <option value="Literature">Literature</option>
-                </select>
-              </label>
-              <label class="field">
-                <span data-i18n="format">Format</span>
-                <select class="inp" id="book-format">
-                  <option value="PDF">PDF</option>
-                  <option value="EPUB">EPUB</option>
-                  <option value="Audio">Audio</option>
-                </select>
-              </label>
-              <label class="field">
-                <span data-i18n="rating">Reyting</span>
-                <input class="inp" id="book-rating" type="number" min="1" max="5" step="0.1" value="4.5" />
-              </label>
-            </div>
-            <label class="field">
-              <span data-i18n="description">Tavsif</span>
-              <textarea class="inp" id="book-description" rows="4"></textarea>
-            </label>
-            <button class="btn-primary" type="submit" data-i18n="save">Saqlash</button>
-          </form>
+          <!-- Admin tabs -->
+          <div class="tabs-bar">
+            <button class="tab-btn active" onclick="switchAdminTab('books')"  data-admintab="books"  data-i18n="tab_books">Kitoblar</button>
+            <button class="tab-btn"        onclick="switchAdminTab('users')"  data-admintab="users"  data-i18n="tab_users">Foydalanuvchilar</button>
+          </div>
 
-          <article class="card admin-list">
-            <h2 data-i18n="current_books">Joriy kitoblar</h2>
-            <div id="admin-books" class="table-wrap"></div>
-          </article>
+          <!-- Admin tab: Books -->
+          <div id="admin-tab-books" class="tab-panel">
+            <!-- Book form -->
+            <form id="book-form" class="card admin-form">
+              <div class="admin-form-title">
+                <h2 id="book-form-title" data-i18n="add_book">Kitob qo'shish</h2>
+                <button type="button" class="btn-ghost hidden" id="cancel-edit-btn" onclick="cancelEdit()" data-i18n="cancel">Bekor qilish</button>
+              </div>
+              <input type="hidden" id="editing-book-id" value="" />
+              <div class="form-grid">
+                <label class="field">
+                  <span data-i18n="title">Sarlavha</span>
+                  <input class="inp" id="book-title" required />
+                </label>
+                <label class="field">
+                  <span data-i18n="author">Muallif</span>
+                  <input class="inp" id="book-author" required />
+                </label>
+                <label class="field">
+                  <span data-i18n="year">Yil</span>
+                  <input class="inp" id="book-year" type="number" min="1900" max="2100" required />
+                </label>
+                <label class="field">
+                  <span data-i18n="category">Kategoriya</span>
+                  <select class="inp" id="book-category">
+                    <option value="IT">IT</option>
+                    <option value="Physics">Physics</option>
+                    <option value="Math">Math</option>
+                    <option value="Literature">Literature</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span data-i18n="format">Format</span>
+                  <select class="inp" id="book-format">
+                    <option value="PDF">PDF</option>
+                    <option value="EPUB">EPUB</option>
+                    <option value="AUDIO">Audio</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span data-i18n="rating">Reyting</span>
+                  <input class="inp" id="book-rating" type="number" min="1" max="5" step="0.1" value="4.5" />
+                </label>
+              </div>
+              <label class="field">
+                <span data-i18n="description">Tavsif</span>
+                <textarea class="inp" id="book-description" rows="3"></textarea>
+              </label>
+              <div class="form-grid">
+                <label class="field">
+                  <span data-i18n="cover_image">Muqova rasmi</span>
+                  <input class="inp inp-file" id="book-cover" type="file" accept="image/*" />
+                  <span class="file-hint" id="cover-hint"></span>
+                </label>
+                <label class="field">
+                  <span data-i18n="book_file">Kitob fayli (PDF/EPUB/MP3)</span>
+                  <input class="inp inp-file" id="book-file" type="file" accept=".pdf,.epub,.mp3,.m4a" />
+                  <span class="file-hint" id="file-hint"></span>
+                </label>
+              </div>
+              <button class="btn-primary" type="submit" id="book-save-btn" data-i18n="save">Saqlash</button>
+            </form>
+
+            <!-- Books table -->
+            <article class="card admin-list">
+              <h2 data-i18n="current_books">Joriy kitoblar</h2>
+              <div id="admin-books" class="table-wrap"></div>
+            </article>
+          </div>
+
+          <!-- Admin tab: Users -->
+          <div id="admin-tab-users" class="tab-panel hidden">
+            <article class="card admin-list">
+              <div class="admin-list-header">
+                <h2 data-i18n="tab_users">Foydalanuvchilar</h2>
+                <button class="btn-outline" onclick="loadUsers()" data-i18n="refresh">Yangilash</button>
+              </div>
+              <div id="admin-users" class="table-wrap"></div>
+            </article>
+          </div>
         </div>
       </section>
+
     </main>
-  </div>
+  </div><!-- /main-app -->
 
   <script src="{% static 'script.js' %}"></script>
 </body>

@@ -8,6 +8,8 @@ from .views import (
     NoteViewSet,
     NotificationViewSet,
     ReadingProgressViewSet,
+    UserListView,
+    UserDetailView,
 )
 
 router = DefaultRouter()
@@ -20,4 +22,6 @@ urlpatterns = [
     path('', include(router.urls)),
     path('auth/login/', obtain_auth_token, name='api-login'),
     path('auth/user/', CurrentUserView.as_view(), name='api-user'),
+    path('auth/users/', UserListView.as_view(), name='user-list'),
+    path('auth/users/<int:pk>/', UserDetailView.as_view(), name='user-detail'),
 ]
