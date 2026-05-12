@@ -1,6 +1,48 @@
+const API_BASE = '/api';
+let authToken = localStorage.getItem('authToken') || null;
+
+async function apiGet(url) {
+  const headers = {};
+
+  if (authToken) {
+    headers['Authorization'] = `Token ${authToken}`;
+  }
+
+  const res = await fetch(`${API_BASE}${url}`, {
+    method: 'GET',
+    headers: headers,
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    console.error("API GET xatosi:", res.status, text);
+    throw new Error('API xatosi');
+  }
+
+  return await res.json();
+}
+
+async function apiPost(url, data) {
+  const headers = {
+    'Content-Type': 'application/json',
+  };
+
+  if (authToken) {
+    headers['Authorization'] = `Token ${authToken}`;
+  }
+
+  const res = await fetch(`${API_BASE}${url}`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) throw new Error('Saqlashda xatolik');
+  return await res.json();
+}
+
 // Django API-ready frontend.
 // Backend endpointlarni moslashtirish uchun shu qiymatni o'zgartiring:
-const API_BASE = window.API_BASE || '/api';
 const USE_API = true;
 
 const LANGS = {
@@ -43,6 +85,7 @@ let filteredBooks = [];
 let currentBook = null;
 let readerFont = 17;
 let apiWarned = false;
+let isAdmin = false;
 
 const demoBooks = [
   { id: 1, title: 'Neural Architectures in Python', author: 'Dr. Elena Vosovic', year: 2023, category: 'IT', format: 'PDF', rating: 4.9, description: 'Python orqali neyron tarmoqlar asoslari va amaliy arxitekturalar.' },
@@ -103,36 +146,85 @@ async function apiRequest(path, options = {}) {
 
 async function loadBooks() {
   try {
-    const data = await apiRequest('/books/');
-    books = Array.isArray(data) ? data : (data.results || []);
+    const data = await apiGet('/books/');
+
+    const list = Array.isArray(data)
+      ? data
+      : Array.isArray(data.results)
+        ? data.results
+        : [];
+
+    books = list.map(b => ({
+      id: b.id,
+      title: b.title || '',
+      author: b.author || '',
+      year: b.year || '',
+      cat: b.cat || b.category || '',
+      category: b.category || b.cat || '',
+      fmt: b.fmt || b.format || 'PDF',
+      format: b.format || b.fmt || 'PDF',
+      cit: b.cit || b.citations || 0,
+      citations: b.citations || b.cit || 0,
+      rating: b.rating || 0,
+      description: b.description || '',
+      cover_url: b.cover_url || null,
+      file_url: b.file_url || null,
+    }));
+
+    filteredBooks = [...books];
+
+    if (typeof renderCatalog === 'function') renderCatalog();
+    if (typeof renderRecentBooks === 'function') renderRecentBooks();
+
   } catch (error) {
-    books = [...demoBooks];
-    if (!apiWarned) {
-      showToast(t('api_fallback'));
-      apiWarned = true;
-    }
+    console.error("Kitoblarni yuklashda xato:", error);
+    showToast("Kitoblarni yuklashda xatolik");
   }
-  filteredBooks = [...books];
-  renderAll();
 }
 
 async function doLogin(event) {
   if (event) event.preventDefault();
-  const id = document.getElementById('login-id').value.trim();
-  const password = document.getElementById('login-password').value.trim();
+
+  const username = document.getElementById('login-id')?.value.trim();
+  const password = document.getElementById('login-password')?.value.trim();
 
   try {
-    await apiRequest('/auth/login/', {
+    const res = await fetch('/api/auth/login/', {
       method: 'POST',
-      body: JSON.stringify({ username: id, password })
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: username,
+        password: password,
+      }),
     });
-    openApp();
-  } catch (error) {
-    if (id === '322201100452' && password === 'student123') {
-      openApp();
-    } else {
-      showToast(t('login_error'));
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error("Login xatosi:", data);
+      showToast("Login yoki parol noto‘g‘ri");
+      return;
     }
+
+    authToken = data.token;
+    localStorage.setItem('authToken', data.token);
+
+    document.getElementById('login-page').classList.add('hidden');
+    document.getElementById('main-app').classList.remove('hidden');
+
+  } catch (error) {
+    console.error("Login server xatosi:", error);
+    showToast("Server bilan aloqa yo‘q");
+    return;
+  }
+
+  try {
+    await renderAll();
+  } catch (error) {
+    console.error("Sahifa yuklash xatosi:", error);
+    showToast("Sahifani yuklashda xatolik");
   }
 }
 
@@ -140,8 +232,7 @@ function openApp() {
   document.getElementById('login-page').classList.add('hidden');
   document.getElementById('main-app').classList.remove('hidden');
   showToast(t('login_ok'));
-  loadBooks();
-  showPage('main');
+  renderAll();
 }
 
 function doLogout() {
@@ -151,6 +242,10 @@ function doLogout() {
 
 const PAGES = ['main', 'catalog', 'reader', 'profile', 'admin'];
 function showPage(page) {
+  if (page === 'admin' && !isAdmin) {
+    page = 'main';
+  }
+
   PAGES.forEach((p) => document.getElementById(`page-${p}`)?.classList.add('hidden'));
   document.getElementById(`page-${page}`)?.classList.remove('hidden');
   document.querySelectorAll('.nav-link').forEach((el) => el.classList.remove('active'));
@@ -237,17 +332,80 @@ function renderAdminBooks() {
   `;
 }
 
+async function addBookFromAdmin() {
+  const title = document.getElementById('book-title').value;
+  const author = document.getElementById('book-author').value;
+  const year = document.getElementById('book-year').value;
+  const category = document.getElementById('book-category').value;
+  const format = document.getElementById('book-format').value;
+
+  try {
+    await apiPost('/books/', {
+      title,
+      author,
+      year,
+      category,
+      format,
+      rating: 0,
+      citations: 0,
+    });
+
+    showToast("Kitob qo‘shildi");
+    await loadBooks();
+  } catch (error) {
+    showToast("Faqat admin kitob qo‘sha oladi");
+  }
+}
+
+async function loadCurrentUser() {
+  if (!authToken) {
+    isAdmin = false;
+    updateAdminUI();
+    return;
+  }
+
+  try {
+    const user = await apiGet('/auth/user/');
+    isAdmin = !!user.is_admin;
+  } catch (error) {
+    console.error('User load xatosi:', error);
+    isAdmin = false;
+  }
+
+  updateAdminUI();
+}
+
+function updateAdminUI() {
+  document.querySelectorAll('.admin-only').forEach((el) => {
+    el.classList.toggle('hidden', !isAdmin);
+  });
+
+  if (!isAdmin && document.getElementById('page-admin')) {
+    const adminPage = document.getElementById('page-admin');
+    if (!adminPage.classList.contains('hidden')) {
+      showPage('main');
+    }
+  }
+}
+
 function renderStats() {
   const el = document.getElementById('stat-books');
   if (el) el.textContent = books.length;
 }
 
-function renderAll() {
+async function renderAll() {
+  await loadCurrentUser();
+  await loadBooks();
   renderStats();
-  renderRecentBooks();
-  renderCatalog();
   renderProfile();
   renderAdminBooks();
+
+  if (typeof renderProfileShelf === 'function') renderProfileShelf();
+  if (typeof renderNotes === 'function') renderNotes();
+  if (typeof renderNotifs === 'function') renderNotifs();
+  if (typeof updateXP === 'function') updateXP();
+
+  showPage('main');
 }
 
 function applyFilters() {

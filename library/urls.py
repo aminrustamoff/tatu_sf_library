@@ -1,0 +1,23 @@
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from rest_framework.authtoken.views import obtain_auth_token
+
+from .views import (
+    BookViewSet,
+    CurrentUserView,
+    NoteViewSet,
+    NotificationViewSet,
+    ReadingProgressViewSet,
+)
+
+router = DefaultRouter()
+router.register('books', BookViewSet, basename='books')
+router.register('notes', NoteViewSet, basename='notes')
+router.register('notifications', NotificationViewSet, basename='notifications')
+router.register('progress', ReadingProgressViewSet, basename='progress')
+
+urlpatterns = [
+    path('', include(router.urls)),
+    path('auth/login/', obtain_auth_token, name='api-login'),
+    path('auth/user/', CurrentUserView.as_view(), name='api-user'),
+]

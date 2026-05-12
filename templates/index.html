@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="uz">
 <head>
@@ -7,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="{% static 'styles.css' %}" />
 </head>
 <body>
   <div id="toast-container" aria-live="polite"></div>
@@ -59,7 +61,7 @@
           <button class="nav-link" id="nl-main" onclick="showPage('main')" data-i18n="nav_main">Bosh</button>
           <button class="nav-link" id="nl-catalog" onclick="showPage('catalog')" data-i18n="nav_catalog">Katalog</button>
           <button class="nav-link" id="nl-profile" onclick="showPage('profile')" data-i18n="nav_profile">Profil</button>
-          <button class="nav-link" id="nl-admin" onclick="showPage('admin')" data-i18n="nav_admin">Admin</button>
+          <button class="nav-link admin-only" id="nl-admin" onclick="showPage('admin')" data-i18n="nav_admin">Admin</button>
         </nav>
 
         <div class="top-actions">
@@ -83,7 +85,7 @@
       <button onclick="showPage('main');toggleMobileMenu()" data-i18n="nav_main">🏠 Bosh</button>
       <button onclick="showPage('catalog');toggleMobileMenu()" data-i18n="nav_catalog">📚 Katalog</button>
       <button onclick="showPage('profile');toggleMobileMenu()" data-i18n="nav_profile">👤 Profil</button>
-      <button onclick="showPage('admin');toggleMobileMenu()" data-i18n="nav_admin">🛠 Admin</button>
+      <button class="admin-only" id="mobile-admin-link" onclick="showPage('admin');toggleMobileMenu()" data-i18n="nav_admin">🛠 Admin</button>
       <button onclick="doLogout()" data-i18n="logout">🚪 Chiqish</button>
     </aside>
 
@@ -293,6 +295,6 @@
     </main>
   </div>
 
-  <script src="script.js"></script>
+  <script src="{% static 'script.js' %}"></script>
 </body>
 </html>
