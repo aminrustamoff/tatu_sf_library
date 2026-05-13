@@ -72,17 +72,13 @@ class CurrentUserView(APIView):
         })
 
 
-def run_ai_prompt(prompt, user=None):
-    # TODO: replace this placeholder with your actual AI model integration.
-    # You can call a local model, cloud API, or custom inference endpoint here.
-    return f"AI model placeholder response for query: '{prompt}'"
-
 
 class AIQueryView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         prompt = str(request.data.get('prompt', '')).strip()
+        history = request.data.get('history', [])
 
         if not prompt:
             return Response(
@@ -90,20 +86,39 @@ class AIQueryView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        if not isinstance(history, list):
+            history = []
+
+        history = history[-6:]
+
+        book_name_list = list(Book.objects.values_list('title', flat=True))
+
         try:
-            response_text = run_ai_prompt(prompt, request.user)
+            response_text = run_ai_prompt(
+                prompt=prompt,
+                user=request.user,
+                book_name_list=book_name_list,
+                history=history
+            )
 
             return Response({
                 'prompt': prompt,
                 'response': response_text
             }, status=status.HTTP_200_OK)
 
+        except ValueError as e:
+            # Configuration yoki settings xatoligi
+            return Response({
+                'detail': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
+            import traceback
+            print(traceback.format_exc())  # Server logs'iga log qil
             return Response({
                 'detail': 'AI server bilan ulanishda xatolik yuz berdi.',
                 'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+        
 
 class NotificationViewSet(viewsets.ModelViewSet):
     serializer_class = NotificationSerializer

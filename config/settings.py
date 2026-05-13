@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-r6swd(l0hsy(9m^g!#9d0d=-m$+6d+g3_ks=))3y-x-x5(($bp
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -122,7 +122,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 
 from pathlib import Path
@@ -131,7 +131,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 TEMPLATES[0]['DIRS'] = [BASE_DIR / 'templates']
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
 MEDIA_URL = '/media/'
@@ -148,6 +148,11 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
 }
+
+# AI Service Configuration
+import os
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-2.0-flash')
 
 import os
 from dotenv import load_dotenv

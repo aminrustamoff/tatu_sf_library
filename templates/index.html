@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'styles.css' %}" />
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
 </head>
 <body>
   <div id="toast-container" aria-live="polite"></div>
@@ -58,7 +59,7 @@
           <button class="nav-link" id="nl-catalog" onclick="showPage('catalog')" data-i18n="nav_catalog">Katalog</button>
           <button class="nav-link" id="nl-profile" onclick="showPage('profile')" data-i18n="nav_profile">Profil</button>
           <button class="nav-link admin-only hidden" id="nl-admin" onclick="showPage('admin')" data-i18n="nav_admin">Admin</button>
-          <button class="nav-link" id="nl-ai" onclick="showPage('ai')" data-i18n="nav_ai">AI Assistant</button>
+          <button class="nav-link" id="nl-ai" onclick="showPage('ai')" data-i18n="nav_ai">AI Yordamchi</button>
         </nav>
 
         <div class="top-actions">
@@ -89,7 +90,7 @@
       <button onclick="showPage('catalog');toggleMobileMenu()" data-i18n="nav_catalog">📚 Katalog</button>
       <button onclick="showPage('profile');toggleMobileMenu()" data-i18n="nav_profile">👤 Profil</button>
       <button class="admin-only hidden" id="mobile-admin-link" onclick="showPage('admin');toggleMobileMenu()" data-i18n="nav_admin">🛠 Admin</button>
-      <button onclick="showPage('ai');toggleMobileMenu()" data-i18n="nav_ai">🤖 AI Assistant</button>
+      <button onclick="showPage('ai');toggleMobileMenu()" data-i18n="nav_ai">🤖 AI Yordamchi</button>
       <button onclick="doLogout()" data-i18n="logout">🚪 Chiqish</button>
     </aside>
 
@@ -288,31 +289,189 @@
       </section>
 
       <!-- ══════════════════ AI ASSISTANT ══════════════════ -->
-      <section id="page-ai" class="page hidden">
-        <div class="container narrow">
-          <div class="page-title-row">
-            <div>
-              <h1 class="font-display" data-i18n="ai_title">AI Assistant</h1>
-              <p class="muted" data-i18n="ai_sub">Interaktiv AI bo'limi, sizning modelni shu yerga ulang.</p>
-            </div>
+      <section id="page-ai" class="page hidden" style="width:100%; padding:30px 0;">
+  <div class="container narrow ai-page-wrap" style="max-width:880px; margin:0 auto; padding:0 16px;">
+    
+    <div class="page-title-row" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <div>
+        <h1 class="font-display" data-i18n="ai_title" style="margin:0; font-size:32px; color:var(--text, #0c1f1d);">
+          AI Assistant
+        </h1>
+        <p class="muted" data-i18n="ai_sub" style="margin:8px 0 0; color:var(--text-muted, #5d8480); font-size:15px;">
+          Savolingizni yozing va AI yordamchisidan javob oling.
+        </p>
+      </div>
+    </div>
+
+    <div
+      class="ai-chat-card"
+      style="
+        width:100%;
+        height:680px;
+        background:var(--surface-card, #ffffff);
+        border:1px solid var(--border, rgba(10,110,104,0.12));
+        border-radius:24px;
+        box-shadow:0 18px 52px rgba(10,110,104,0.18);
+        display:flex;
+        flex-direction:column;
+        overflow:hidden;
+      "
+    >
+
+      <div
+        class="ai-chat-header"
+        style="
+          display:flex;
+          align-items:center;
+          gap:14px;
+          padding:18px 20px;
+          border-bottom:1px solid var(--border, rgba(10,110,104,0.12));
+          background:linear-gradient(135deg, rgba(10,110,104,0.10), rgba(15,163,154,0.16)), var(--surface-card, #ffffff);
+        "
+      >
+        <div
+          class="ai-bot-avatar"
+          style="
+            width:42px;
+            height:42px;
+            border-radius:50%;
+            background:linear-gradient(135deg, var(--primary, #0a6e68), var(--primary-light, #0fa39a));
+            color:#fff;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-weight:700;
+            flex-shrink:0;
+          "
+        >
+          AI
+        </div>
+
+        <div>
+          <h3 style="margin:0; font-size:18px; color:var(--text, #0c1f1d);">
+            AI Assistant
+          </h3>
+          <p style="margin:4px 0 0; font-size:14px; color:var(--text-muted, #5d8480);">
+            Online yordamchi
+          </p>
+        </div>
+      </div>
+
+      <div
+        id="ai-response"
+        class="ai-chat-messages"
+        style="
+          flex:1;
+          padding:22px;
+          overflow-y:auto;
+          background:radial-gradient(circle at top left, rgba(10,110,104,0.10), transparent 32%), var(--surface, #f5f9f8);
+        "
+      >
+        <div
+          class="ai-message ai-message-bot"
+          style="
+            display:flex;
+            align-items:flex-end;
+            gap:10px;
+            margin-bottom:18px;
+            justify-content:flex-start;
+          "
+        >
+          <div
+            class="ai-message-avatar"
+            style="
+              width:42px;
+              height:42px;
+              border-radius:50%;
+              background:linear-gradient(135deg, var(--primary, #0a6e68), var(--primary-light, #0fa39a));
+              color:#fff;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              font-weight:700;
+              flex-shrink:0;
+            "
+          >
+            AI
           </div>
 
-          <article class="card">
-            <label class="field" style="width:100%">
-              <span data-i18n="ai_prompt_label">Savolingiz</span>
-              <textarea class="inp" id="ai-prompt" rows="5" data-i18n-placeholder="ai_input_placeholder" placeholder="Savol yozing..."></textarea>
-            </label>
-            <button class="btn-primary" id="ai-send-btn" type="button" onclick="sendAiPrompt()" data-i18n="ai_send_button">AI ga yuborish</button>
-
-            <div class="card" style="margin-top:1.5rem;padding:1rem;border:1px solid var(--border);border-radius:1rem;">
-              <h3 data-i18n="ai_response_label">Javob</h3>
-              <div id="ai-response" class="ai-response" style="white-space:pre-wrap;min-height:140px;padding-top:0.5rem;">
-                <span data-i18n="ai_response_empty">AI javobi shu yerda ko'rinadi.</span>
-              </div>
-            </div>
-          </article>
+          <div
+            class="ai-message-content"
+            style="
+              max-width:72%;
+              padding:13px 15px;
+              border-radius:18px;
+              border-bottom-left-radius:6px;
+              line-height:1.6;
+              font-size:15px;
+              background:var(--surface-card, #ffffff);
+              color:var(--text, #0c1f1d);
+              border:1px solid var(--border, rgba(10,110,104,0.12));
+              box-shadow:0 1px 3px rgba(10,110,104,0.08);
+            "
+          >
+            <p data-i18n="ai_response_empty" style="margin:0;">
+              Salom! Savolingizni yozing, men javob beraman.
+            </p>
+          </div>
         </div>
-      </section>
+      </div>
+
+      <div
+        class="ai-chat-input-area"
+        style="
+          display:flex;
+          align-items:flex-end;
+          gap:12px;
+          padding:16px;
+          border-top:1px solid var(--border, rgba(10,110,104,0.12));
+          background:var(--surface-card, #ffffff);
+        "
+      >
+        <textarea
+          id="ai-prompt"
+          rows="1"
+          data-i18n-placeholder="ai_input_placeholder"
+          placeholder="Savol yozing..."
+          style="
+            flex:1;
+            min-height:48px;
+            max-height:140px;
+            resize:vertical;
+            border:1px solid var(--border-strong, rgba(10,110,104,0.24));
+            border-radius:16px;
+            padding:13px 15px;
+            font-size:15px;
+            font-family:inherit;
+            outline:none;
+            background:var(--surface, #f5f9f8);
+            color:var(--text, #0c1f1d);
+          "
+        ></textarea>
+
+        <button
+          id="ai-send-btn"
+          type="button"
+          onclick="sendAiPrompt()"
+          data-i18n="ai_send_button"
+          style="
+            min-height:48px;
+            padding:0 22px;
+            border:none;
+            border-radius:16px;
+            background:linear-gradient(135deg, var(--primary, #0a6e68), var(--primary-light, #0fa39a));
+            color:#fff;
+            font-weight:700;
+            cursor:pointer;
+            box-shadow:0 8px 28px rgba(10,110,104,0.12);
+          "
+        >
+          Yuborish
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
 
       <!-- ══ ADMIN ══ -->
       <section id="page-admin" class="page hidden">

@@ -32,25 +32,25 @@ async function apiPost(url, data) {
   return res.json();
 }
 
-async function queryAi(prompt) {
-  return apiPost('/ai/query/', { prompt });
-}
+const aiChatHistory = [];
+const AI_HISTORY_LIMIT = 6;
 
-
-async function askAI(prompt) {
-  const token = localStorage.getItem("access");
-
-  const response = await fetch("http://127.0.0.1:8000/api/ai/query/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
-    body: JSON.stringify({ prompt: prompt })
+function saveAiHistory(role, text) {
+  aiChatHistory.push({
+    role: role,
+    text: String(text || "")
   });
 
-  const data = await response.json();
-  console.log(data.response);
+  if (aiChatHistory.length > AI_HISTORY_LIMIT) {
+    aiChatHistory.shift();
+  }
+}
+
+async function queryAi(prompt, history = []) {
+  return apiPost('/ai/query/', {
+    prompt: prompt,
+    history: history
+  });
 }
 
 
@@ -58,21 +58,43 @@ async function sendAiPrompt() {
   const input = document.getElementById('ai-prompt');
   const btn = document.getElementById('ai-send-btn');
   const responseEl = document.getElementById('ai-response');
+
   if (!input || !btn || !responseEl) return;
 
   const prompt = input.value.trim();
-  if (!prompt) { showToast(t('ai_empty_prompt')); return; }
+
+  if (!prompt) {
+    showToast(t('ai_empty_prompt'));
+    return;
+  }
+
+  addUserMessage(prompt);
+  input.value = '';
 
   btn.disabled = true;
   const originalText = btn.textContent;
   btn.textContent = '...';
-  responseEl.textContent = t('ai_waiting');
+
+  showAiTyping();
 
   try {
-    const data = await queryAi(prompt);
-    responseEl.textContent = data.response || t('ai_no_response');
+    const historyToSend = [...aiChatHistory];
+
+    const data = await queryAi(prompt, historyToSend);
+
+    removeAiTyping();
+
+    const aiAnswer = data.response || t('ai_no_response');
+
+    addAiMessage(aiAnswer);
+
+    saveAiHistory("user", prompt);
+    saveAiHistory("assistant", aiAnswer);
+
   } catch (e) {
-    responseEl.textContent = t('ai_error_occurred');
+    removeAiTyping();
+
+    addAiErrorMessage(t('ai_error_occurred'));
     showToast(e.message || t('ai_error_occurred'));
   } finally {
     btn.disabled = false;
@@ -113,10 +135,10 @@ const LANGS = {
   uz: {
     login_subtitle: 'Axborot markazi ekotizimi',
     hemis_id: 'HEMIS ID', password: 'Parol', login: 'Kirish', logout: 'Chiqish',
-    nav_main: 'Bosh', nav_catalog: 'Katalog', nav_profile: 'Profil', nav_admin: 'Admin', nav_ai: 'AI',
+    nav_main: 'Bosh', nav_catalog: 'Katalog', nav_profile: 'Profil', nav_admin: 'Admin', nav_ai: 'AI Yordamchi',
     hero_sub: 'Kitoblar katalogi, o\'quvchi profili va admin boshqaruvi uchun yengil platforma.',
     search_placeholder: 'Kitob, muallif yoki kategoriya qidiring', search: 'Qidirish',
-    ai_title: 'AI Assistant', ai_sub: 'Interaktiv AI bo\'limi, sizning modelni shu yerga ulang.',
+    ai_title: 'AI Yordamchi', ai_sub: 'Interaktiv AI bo\'limi, sizga kitob tanlashda eng yaxshi yordamchi.',
     ai_prompt_label: 'Savolingiz', ai_input_placeholder: 'Savol yozing...', ai_send_button: 'AI ga yuborish',
     ai_response_label: 'Javob', ai_response_empty: 'AI javobi shu yerda ko\'rinadi.', ai_empty_prompt: 'Iltimos, savol yozing.',
     ai_waiting: 'Kutilyapti...', ai_no_response: 'Hech qanday javob topilmadi.', ai_error_occurred: 'AI bilan bog\'liq xatolik.',
@@ -154,10 +176,10 @@ const LANGS = {
   ru: {
     login_subtitle: 'Экосистема информационного центра',
     hemis_id: 'HEMIS ID', password: 'Пароль', login: 'Войти', logout: 'Выйти',
-    nav_main: 'Главная', nav_catalog: 'Каталог', nav_profile: 'Профиль', nav_admin: 'Админ', nav_ai: 'AI',
+    nav_main: 'Главная', nav_catalog: 'Каталог', nav_profile: 'Профиль', nav_admin: 'Админ', nav_ai: 'AI-помощник',
     hero_sub: 'Лёгкая платформа для каталога книг, профиля читателя и административной панели.',
     search_placeholder: 'Поиск по книге, автору или категории', search: 'Поиск',
-    ai_title: 'AI Assistant', ai_sub: 'Интерактивный AI-раздел, подключите вашу модель здесь.',
+    ai_title: 'AI помощник', ai_sub: 'Интерактивный AI-помощник поможет вам выбрать подходящую книгу.',
     ai_prompt_label: 'Ваш вопрос', ai_input_placeholder: 'Введите запрос...', ai_send_button: 'Отправить AI',
     ai_response_label: 'Ответ', ai_response_empty: 'Ответ AI появится здесь.', ai_empty_prompt: 'Пожалуйста, введите запрос.',
     ai_waiting: 'Ожидание...', ai_no_response: 'Ответ не получен.', ai_error_occurred: 'Ошибка AI.',
@@ -195,10 +217,10 @@ const LANGS = {
   en: {
     login_subtitle: 'Information center ecosystem',
     hemis_id: 'HEMIS ID', password: 'Password', login: 'Login', logout: 'Logout',
-    nav_main: 'Home', nav_catalog: 'Catalog', nav_profile: 'Profile', nav_admin: 'Admin', nav_ai: 'AI',
+    nav_main: 'Home', nav_catalog: 'Catalog', nav_profile: 'Profile', nav_admin: 'Admin', nav_ai: 'AI Assistant',
     hero_sub: 'A lightweight platform for book catalog, reader profile and admin management.',
     search_placeholder: 'Search by book, author or category', search: 'Search',
-    ai_title: 'AI Assistant', ai_sub: 'Interactive AI section, connect your model here.',
+    ai_title: 'AI Assistant', ai_sub: 'An interactive AI assistant to help you choose the right book.',
     ai_prompt_label: 'Your question', ai_input_placeholder: 'Enter a question...', ai_send_button: 'Ask AI',
     ai_response_label: 'Response', ai_response_empty: 'The AI answer will appear here.', ai_empty_prompt: 'Please enter a question.',
     ai_waiting: 'Waiting...', ai_no_response: 'No response received.', ai_error_occurred: 'AI error occurred.',
@@ -1134,3 +1156,193 @@ document.addEventListener('DOMContentLoaded', () => {
     initApp();
   }
 });
+
+
+
+function addUserMessage(text) {
+  const messagesBox = document.getElementById("ai-response");
+
+  messagesBox.innerHTML += `
+    <div style="
+      display:flex;
+      justify-content:flex-end;
+      margin-bottom:18px;
+    ">
+      <div style="
+        max-width:72%;
+        padding:13px 15px;
+        border-radius:18px;
+        border-bottom-right-radius:6px;
+        line-height:1.6;
+        font-size:15px;
+        background:linear-gradient(135deg, var(--primary, #0a6e68), var(--primary-light, #0fa39a));
+        color:#fff;
+        box-shadow:0 1px 3px rgba(10,110,104,0.08);
+      ">
+        <p style="margin:0;">${DOMPurify.sanitize(String(text))}</p>
+      </div>
+    </div>
+  `;
+
+  scrollAiChatToBottom();
+}
+
+function addAiMessage(text) {
+  const messagesBox = document.getElementById("ai-response");
+
+  const safeHtml = DOMPurify.sanitize(String(text));
+
+  messagesBox.innerHTML += `
+    <div style="
+      display:flex;
+      align-items:flex-end;
+      gap:10px;
+      margin-bottom:18px;
+      justify-content:flex-start;
+    ">
+      <div style="
+        width:42px;
+        height:42px;
+        border-radius:50%;
+        background:linear-gradient(135deg, var(--primary, #0a6e68), var(--primary-light, #0fa39a));
+        color:#fff;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-weight:700;
+        flex-shrink:0;
+      ">
+        AI
+      </div>
+
+      <div style="
+        max-width:72%;
+        padding:15px 13px 15px 30px;
+        border-radius:18px;
+        border-bottom-left-radius:6px;
+        line-height:1.6;
+        font-size:15px;
+        background:var(--surface-card, #ffffff);
+        color:var(--text, #0c1f1d);
+        border:1px solid var(--border, rgba(10,110,104,0.12));
+        box-shadow:0 1px 3px rgba(10,110,104,0.08);
+      ">
+        <div style="margin:0; white-space:normal;">
+          ${safeHtml}
+        </div>
+      </div>
+    </div>
+  `;
+
+  scrollAiChatToBottom();
+}
+
+function showAiTyping() {
+  const messagesBox = document.getElementById("ai-response");
+  const typingId = "ai-typing-message";
+
+  const oldTyping = document.getElementById(typingId);
+  if (oldTyping) oldTyping.remove();
+
+  messagesBox.innerHTML += `
+    <div id="${typingId}" style="
+      display:flex;
+      align-items:flex-end;
+      gap:10px;
+      margin-bottom:18px;
+      justify-content:flex-start;
+    ">
+      <div style="
+        width:42px;
+        height:42px;
+        border-radius:50%;
+        background:linear-gradient(135deg, var(--primary, #0a6e68), var(--primary-light, #0fa39a));
+        color:#fff;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-weight:700;
+        flex-shrink:0;
+      ">
+        AI
+      </div>
+
+      <div style="
+        padding:13px 15px;
+        border-radius:18px;
+        border-bottom-left-radius:6px;
+        background:var(--surface-card, #ffffff);
+        color:var(--text-muted, #5d8480);
+        border:1px solid var(--border, rgba(10,110,104,0.12));
+      ">
+        Yozmoqda...
+      </div>
+    </div>
+  `;
+
+  scrollAiChatToBottom();
+}
+
+function removeAiTyping() {
+  const typing = document.getElementById("ai-typing-message");
+  if (typing) typing.remove();
+}
+
+function addAiErrorMessage(text) {
+  const messagesBox = document.getElementById("ai-response");
+
+  messagesBox.innerHTML += `
+    <div style="
+      display:flex;
+      align-items:flex-end;
+      gap:10px;
+      margin-bottom:18px;
+      justify-content:flex-start;
+    ">
+      <div style="
+        width:42px;
+        height:42px;
+        border-radius:50%;
+        background:linear-gradient(135deg, var(--primary, #0a6e68), var(--primary-light, #0fa39a));
+        color:#fff;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-weight:700;
+        flex-shrink:0;
+      ">
+        AI
+      </div>
+
+      <div style="
+        max-width:72%;
+        padding:13px 15px;
+        border-radius:18px;
+        border-bottom-left-radius:6px;
+        line-height:1.6;
+        font-size:15px;
+        background:rgba(192,57,43,0.10);
+        color:var(--error, #c0392b);
+        border:1px solid var(--error, #c0392b);
+      ">
+        <p style="margin:0;">${escapeHtml(text)}</p>
+      </div>
+    </div>
+  `;
+
+  scrollAiChatToBottom();
+}
+
+function scrollAiChatToBottom() {
+  const messagesBox = document.getElementById("ai-response");
+  messagesBox.scrollTop = messagesBox.scrollHeight;
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
