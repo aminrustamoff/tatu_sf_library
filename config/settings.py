@@ -41,6 +41,10 @@ ALLOWED_HOSTS = [
     "*"
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://yusupov-feruz.up.railway.app",
+]
+
 
 # Application definition
 
