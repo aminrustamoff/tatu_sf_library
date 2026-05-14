@@ -38,6 +38,7 @@ ALLOWED_HOSTS = [
     ".railway.app",
     ".up.railway.app",
     "yusupov-feruz.up.railway.app",
+    "*"
 ]
 
 
